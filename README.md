@@ -8,40 +8,31 @@ The following instructions list all of the requirements to run the program. This
 
 The program uses Mapquest [Mapquest API](https://developer.mapquest.com/) to convert the input address into GPS coordinates. The Mapquest API requires an API key in order to use it, which can be generated for free. In order to generate an API key, follow instructions on their website. The first time you run the script, it will prompt you for this API key. For subsequent runs, the script will use the stored value and will not prompt you again.
 
-# Creating virtual environment
+# Setup environment to run script
 
-With python installed, enter the following command into the terminal. This only needs to be done the first time you run the script. After that, you can just skip to the active the virtual environment step.
+The package includes a handy shell script to run all of the steps to setup your virtual environment that you'll need to run the script. To run the shell script, make sure you are in the project directory and paste the following into your terminal. This only needs to be done the first time after downloading the package.
+
 ```
-python3 -m venv venv
+./setup_environment.sh
 ```
 
-# Activating virtual environment
+# Run script
 
-Run the following command to activate your virtual environment.
+To run the main script via a helper shell script, make sure you are in the project directory and paste the following into your terminal. The helper shell script activates the virtual environment for you, runs the main script, and then deactivates the virtual environment automatically.
+
+```
+./run_script.sh
+```
+
+The script will prompt you for input values right in the terminal upon running it. If at any point you want to exit, just type `Control + C` into the command line. The first time you run the script, it will prompt you for the Mapquest API key. For subsequent runs, the script will use the stored value and will not prompt you again. To generate the Mapquest API key, follow the instructions above.
+
+Alternatively, you can run the python script directly without the helper script. To do that, run the following commands:
 
 ```
 source venv/bin/activate
-```
-
-# Installing requirements in virtual environment
-
-This only needs to be done the first time using the program. After that, you can just skip to the active the virtual environment step.
-
-```
-pip install --upgrade pip
-pip install -r requirements.txt
-python setup.py install
-```
-
-# Running the script
-
-Now that you have the virtual environment set up, you can run the script. Enter the following on the command line:
-
-```
 python seismic_values_generator.py
+deactivate
 ```
-
-The script will prompt you for input values right in the terminal upon running it. If at any point you want to exit, just type `Control + C` into the command line.
 
 # License
 
