@@ -1,4 +1,13 @@
-import requests, json, csv, sys, pandas as pd, config as cfg
+import requests, json, csv, sys, pandas as pd
+
+# try to import config module. if error, prompt user for mapquest api key
+try:
+    import config as cfg
+except ImportError:
+    key = input('Please paste in your Mapquest API key (you only need to do this the first time): ')
+    with open(f'config.py', 'w') as f:
+        f.write(f'MAPQUEST_API_KEY = "{key}"')
+    import config as cfg
 
 class SeismicValues:
 
