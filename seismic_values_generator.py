@@ -43,7 +43,7 @@ class SeismicValues:
             self.getprojectCoordinates(address)
         except:
             print(errorMessage)
-            self.getAddressInput()
+            address = self.getAddressInput()
 
         return address
 
@@ -55,7 +55,7 @@ class SeismicValues:
 
         if site_class not in site_classes:
             print(f'Input site class is invalid. Please input one of the following: {site_classes} and try again.')
-            self.getSiteClassInput()
+            site_class = self.getSiteClassInput()
 
         return site_class
 
@@ -67,7 +67,7 @@ class SeismicValues:
 
         if risk_category not in risk_categories:
             print(f'Input risk category is invalid. Please input one of the following: {risk_categories} and try again.')
-            self.getRiskCategoryInput()
+            risk_category = self.getRiskCategoryInput()
 
         return risk_category
 
@@ -79,8 +79,12 @@ class SeismicValues:
 
         response = requests.get('https://earthquake.usgs.gov/ws/designmaps/asce7-16.json',
         params = payload)
-        print(f"SDS... {json.loads(response.text)['response']['data']['sds']}g")
         print(f"SS... {json.loads(response.text)['response']['data']['ss']}g")
+        print(f"S1... {json.loads(response.text)['response']['data']['s1']}g")
+        print(f"SMS... {json.loads(response.text)['response']['data']['sms']}g")
+        print(f"SM1... {json.loads(response.text)['response']['data']['sm1']}g")
+        print(f"SDS... {json.loads(response.text)['response']['data']['sds']}g")
+        print(f"SD1... {json.loads(response.text)['response']['data']['sd1']}g")
         print(f"TL... {json.loads(response.text)['response']['data']['tl']}sec")
         return json.loads(response.text)['response']
 

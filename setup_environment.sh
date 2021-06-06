@@ -5,5 +5,5 @@ python3 -m venv venv
 source venv/bin/activate
 # upgrade pip
 pip install --upgrade pip
-# install requirements in virtual envir
+# install requirements in virtual environment
 pip install -r requirements.txt
