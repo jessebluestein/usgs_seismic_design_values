@@ -1,4 +1,4 @@
-import requests, json, csv, sys, pandas as pd
+import xlsxwriter, json, requests, pandas as pd
 
 # try to import config module. if error, prompt user for mapquest api key
 try:
@@ -35,6 +35,8 @@ class SeismicValues:
 
     def getAddressInput(self):
         """Get address input from user. Validate that input produces successful query."""
+
+        print('########## INPUT PARAMETERS ##########')
 
         address = input('Please enter the project address: ')
         errorMessage = 'Input address is invalid or does not produce unique result. Please try again.'
@@ -79,28 +81,59 @@ class SeismicValues:
 
         response = requests.get('https://earthquake.usgs.gov/ws/designmaps/asce7-16.json',
         params = payload)
-        print(f"SS... {json.loads(response.text)['response']['data']['ss']}g")
-        print(f"S1... {json.loads(response.text)['response']['data']['s1']}g")
-        print(f"SMS... {json.loads(response.text)['response']['data']['sms']}g")
-        print(f"SM1... {json.loads(response.text)['response']['data']['sm1']}g")
-        print(f"SDS... {json.loads(response.text)['response']['data']['sds']}g")
-        print(f"SD1... {json.loads(response.text)['response']['data']['sd1']}g")
-        print(f"TL... {json.loads(response.text)['response']['data']['tl']}sec")
-        return json.loads(response.text)['response']
+        return response.text
 
     def writeSeismicValues(self):
-        """Write seismic values to JSON and CSV formats."""
+        """Write seismic values to output spreadsheet."""
 
-        # write output JSON file
+        # convert json response to base df
+        df_base = pd.DataFrame(data=json.loads(self.seismicValues)['response'])
+
+        # remove metadata column from base df
+        df_base = df_base.drop(columns = 'metadata')
+
+        # remove rows with NaN value from base df
+        df_base = df_base.dropna()
+
+        # put response spectra data on separate sheets in workbook
+        response_spectra_dfs = []
+        for idx in range(4):
+            response_spectra_dfs.append(df_base.tail(1)) # pull out last row
+            df_base.drop(df_base.tail(1).index, inplace = True) # drop last row
+
+        print('########## RESPONSE DATA ##########')
+
+        print(df_base.to_string(header = False))
+        print('See output spreadsheet for response spectra data and plots.')
+
+        # write dfs to excel spreadsheet
         cleanAddress = self.address.replace(' ','_')
         cleanAddress = cleanAddress.replace(',', '')
         outputFileName = f"{cleanAddress}_outputData"
-        with open(f'{outputFileName}.json', 'w') as outfile:
-            json.dump(self.seismicValues, outfile, indent = 4)
 
-        # write output CSV file
-        df = pd.read_json(f'./{outputFileName}.json')
-        export_csv = df.to_csv(f'./{outputFileName}.csv')
+        with pd.ExcelWriter(f'./{outputFileName}.xlsx') as writer:
+            df_base.to_excel(writer, sheet_name='seismic_vals', header = False)
+            for df in response_spectra_dfs:
+                sheet = df.index[0]
+                vals_only_df = pd.DataFrame(df['data'].iloc[-1])
+                vals_only_df.columns = ['Period [s]', 'Spectral Acceleration [g]']
+                vals_only_df.to_excel(writer, sheet_name=sheet, index = False)
+
+                # make plots
+                workbook  = writer.book
+                chart = workbook.add_chart({'type': 'scatter', 'subtype': 'smooth'})
+                chart.add_series({
+                    'name':       f'={sheet}',
+                    'categories': f'={sheet}!$A$2:$A$1000',
+                    'values':     f'={sheet}!$B$2:$B$1000',
+                })
+                chart.set_title ({'name': sheet})
+                chart.set_x_axis({'name': 'Period [s]'})
+                chart.set_y_axis({'name': 'Spectral Acceleration [g]'})
+                chart.set_style(15)
+                chart.set_legend({'position': 'none'})
+                worksheet = workbook.get_worksheet_by_name(sheet)
+                worksheet.insert_chart('C1', chart)
 
 if __name__ == '__main__':
 

@@ -1,6 +1,6 @@
 # Seismic Design Values Generator Tool
 
-A python program that queries the seismic design values for a particular address, site class and risk category, using the USGS Design Maps database and produces an output CSV file.
+This python program queries the seismic design values for a particular address, site class and risk category, using the USGS Design Maps database. It then outputs the results in the form of an Excel Spreadsheet along with plots of the response spectra for the site.
 
 The following instructions list all of the requirements to run the program. This assumes that the user has a basic understanding of how to run a python script. [Click here](https://www.python.org/downloads/) to see the python website, where you can download the latest version of python.
 
@@ -33,6 +33,8 @@ source venv/bin/activate
 python seismic_values_generator.py
 deactivate
 ```
+
+After the script runs, it prints the seismic design values to the terminal. It outputs these same values to an Excel file, along with plots of the response spectra. The output Excel file is stored in the same folder as this code.
 
 # License
 
